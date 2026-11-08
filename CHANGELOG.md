@@ -1,5 +1,12 @@
 # Änderungen
 
+## GitHub-Übernahme
+
+- Quellcode und Dokumentation auf `Kirchmeister/lernen`, Branch `main`, übernommen; ursprünglichen GitHub-Commit erhalten.
+- Bestätigte Clone-URL in die Installationsanleitungen eingetragen.
+- [Erster GitHub-Actions-Lauf](https://github.com/Kirchmeister/lernen/actions/runs/42486357276) erfolgreich: 16 Tests, Image-Bau und Compose-Konfiguration.
+- Produktiver Serverbetrieb und reale Geräteprüfung stehen weiterhin aus.
+
 ## Vorbereitung für GitHub
 
 - README als Einstieg für Installation, Betrieb und Datenwiederherstellung neu strukturiert.

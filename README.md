@@ -13,7 +13,7 @@ Das gesamte Projekt einschließlich Installationsanleitungen liegt im Repository
 - Aufgaben nach richtigen Antworten an drei verschiedenen Tagen archivieren.
 - Lernpunkte und persönliche Meilensteine sammeln, ohne Ranglisten oder täglichen Pflichtlauf.
 
-**Projektstand:** erste Version für einen Familienbetrieb. Die Anwendungstests bestehen. Containerbetrieb, mobile Darstellung und Passkeys auf echten Geräten müssen vor dem regulären Einsatz auf dem Zielserver geprüft werden. Die genaue Abgrenzung steht unter [Projektstand und offene Punkte](docs/PROJEKTSTAND.md).
+**Projektstand:** erste Version für einen Familienbetrieb. Die 16 Tests, der Docker-Image-Bau und die Compose-Validierung bestehen auch auf GitHub. Containerstart und Wiederherstellung auf dem Zielserver, mobile Darstellung und Passkeys auf echten Geräten müssen noch praktisch geprüft werden. Die genaue Abgrenzung steht unter [Projektstand und offene Punkte](docs/PROJEKTSTAND.md).
 
 ## Wo beginne ich?
 

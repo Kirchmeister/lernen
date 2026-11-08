@@ -9,6 +9,7 @@
 - SQLite-Persistenz, Containerdefinition und Caddy-Konfiguration für HTTPS.
 - Deutsche Dokumentation, KI-Wiederanlauf, Konfigurations-, Backup- und Restore-Hilfen.
 - Lokale automatisierte Anwendungsprüfungen einschließlich kryptografischer Passkey-Signaturprüfung.
+- Erfolgreicher [GitHub-Actions-Lauf vom 8. November 2026](https://github.com/Kirchmeister/lernen/actions/runs/42486357276): 16 Tests, Syntax-/Dokumentationsprüfung, Docker-Image-Bau und Compose-Validierung bestanden.
 
 ## Vor dem Einsatz noch praktisch prüfen
 
@@ -16,7 +17,6 @@
 - Passkey-Anlegen, Anmelden und Wiederherstellen auf den Zielgeräten unter der endgültigen Domain.
 - Docker-Bau, HTTPS-Zertifikat und Neustartverhalten auf dem Ubuntu-Zielserver.
 - Backup und vollständige Wiederherstellung auf einem getrennten Docker-Testsystem.
-- GitHub-Actions-Lauf nach dem Upload; lokal ist kein entfernter Workflow ausgeführt.
 
 Die Erstellungsumgebung bot keine funktionierende Browser-Vorschau und keinen verifizierten Docker-Zielbetrieb. Shell-/Archivtests und Software-Authenticator-Tests sind enger begrenzt als diese praktische Abnahme.
 
