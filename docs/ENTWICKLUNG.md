@@ -42,6 +42,7 @@ Die Relying-Party-ID wird aus dem Hostnamen der `ORIGIN` abgeleitet. Bei direkte
 | Prüfung                    | Inhalt                                                                                         |
 | -------------------------- | ---------------------------------------------------------------------------------------------- |
 | `tests/learning.test.mjs`  | Formate, Normalisierung, Zahlen, Auswahl, Archivierung und Schutz der Lösungen                 |
+| `tests/packages.test.mjs` | Migration, Zuordnung, Versionskonflikte, Historie, Fortschrittserhalt und familienbegrenzte Löschung |
 | `tests/server.test.mjs`    | HTTP-Abläufe, Rollen, Wiederholungen, Testmodus und Paketaktualisierung                        |
 | `tests/passkeys.test.mjs`  | Kryptografische Registrierung/Anmeldung mit Software-Authenticator, Einladungen und Challenges |
 | `tests/test_operations.py` | Konfiguration, sichere Archivprüfung und Fehlerbehandlung beim Backup mit simuliertem Docker   |

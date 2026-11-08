@@ -8,12 +8,17 @@ Das gesamte Projekt einschließlich Installationsanleitungen liegt im Repository
 
 - Eigene Eltern- und Schülerkonten mit Passkeys, ohne Passwortanmeldung.
 - Englische und lateinische Wörter schreiben, Multiple Choice beantworten und Zahlenaufgaben lösen.
-- JSON-Lernpakete hochladen, alle Lösungen prüfen und für die Familie freigeben.
+- JSON-Lernpakete mit sichtbarer Versionshistorie importieren und gezielt einem oder mehreren Kindern zuordnen.
+- Alle Fragen als Eltern selbst ausprobieren, ohne Schülerdaten zu verändern; Pakete exportieren oder löschen.
 - Üben mit Erklärungen und Fehlerwiederholungen oder einen Test mit Auswertung am Ende durchführen.
 - Aufgaben nach richtigen Antworten an drei verschiedenen Tagen archivieren.
 - Lernpunkte und persönliche Meilensteine sammeln, ohne Ranglisten oder täglichen Pflichtlauf.
 
 **Projektstand:** erste Version für einen Familienbetrieb. Die Anwendungstests, der Docker-Image-Bau und die Compose-Validierung bestehen auch auf GitHub. Containerstart und Wiederherstellung auf dem Zielserver, mobile Darstellung und Passkeys auf echten Geräten müssen noch praktisch geprüft werden. Die genaue Abgrenzung steht unter [Projektstand und offene Punkte](docs/PROJEKTSTAND.md).
+
+## Elternbereich
+
+Die [Bedienungsanleitung für Eltern](docs/ELTERNBEREICH.md) erklärt Zuordnungen, Importvorschau, Inhaltsversionen, Elternvorschau und Löschen. Neue Pakete bleiben ohne ausgewählte Kinder zunächst nur im Elternbereich. Vor einem Update die dort beschriebene Datenbankmigration und den Rückweg lesen.
 
 ## Wo beginne ich?
 

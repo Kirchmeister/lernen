@@ -47,6 +47,19 @@ test("HTTP: Rollen, Import, Üben, Test, Antwortschutz und Wiederholung", async 
       cookie: r.headers.get("set-cookie")?.split(";")[0],
     };
   };
+  const save = async (pack, cookie, children) => {
+    const plan = (await request("packages/validate", pack, cookie)).body;
+    return request(
+      "packages",
+      {
+        pack,
+        expectedRevision: plan.currentRevision,
+        expectedAssignedTo: plan.assignedTo,
+        ...(children ? { children } : {}),
+      },
+      cookie,
+    );
+  };
   try {
     await ready;
     assert.equal((await request("state")).status, 401);
@@ -152,7 +165,7 @@ test("HTTP: Rollen, Import, Üben, Test, Antwortschutz und Wiederholung", async 
       id: "new-pack",
       title: "Neues Paket",
     };
-    assert.equal((await request("packages", imported, parent)).status, 200);
+    assert.equal((await save(imported, parent, ["demo-student"])).status, 200);
     assert.equal(
       (await request("state", undefined, student)).body.packages.length,
       4,
@@ -195,9 +208,9 @@ test("HTTP: Rollen, Import, Üben, Test, Antwortschutz und Wiederholung", async 
       { round: r.id, question: q.id, value: q.answers[0] },
       student,
     );
-    assert.equal((await request("packages", packs[0], parent)).status, 400);
+    assert.equal((await save(packs[0], parent)).status, 200);
     await request("rounds/close", { round: r.id }, student);
-    assert.equal((await request("packages", packs[0], parent)).status, 200);
+    assert.equal((await save(packs[0], parent)).status, 200);
     assert.equal(
       (await request("state", undefined, student)).body.packages.find(
         (p) => p.id === "english-everyday",
@@ -207,12 +220,162 @@ test("HTTP: Rollen, Import, Üben, Test, Antwortschutz und Wiederholung", async 
     const changed = structuredClone(packs[0]);
     changed.questions.find((n) => n.id === q.id).prompt +=
       " Neue Formulierung.";
-    await request("packages", changed, parent);
+    await save(changed, parent);
     assert.equal(
       (await request("state", undefined, student)).body.packages.find(
         (p) => p.id === "english-everyday",
       ).practiced,
       0,
+    );
+    // Elternvorschau: alle Antworttypen, alte Versionen und keine Statistikänderung.
+    const snapshot = (await request("state", undefined, student)).body;
+    const detailed = (
+      await request("packages/detail?id=english-everyday", undefined, parent)
+    ).body;
+    assert.equal(detailed.revision, 2);
+    assert.equal(detailed.history.length, 2);
+    assert.equal(
+      (await request("packages/detail?id=english-everyday", undefined, student))
+        .status,
+      403,
+    );
+    assert.equal(
+      (await request("packages/detail?id=english-everyday")).status,
+      401,
+    );
+    for (const pack of [changed, packs[1]]) {
+      const detail = (
+        await request("packages/detail?id=" + pack.id, undefined, parent)
+      ).body;
+      for (const question of pack.questions.slice(0, 3)) {
+        const value =
+          question.type === "choice"
+            ? question.correct
+            : question.type === "input"
+              ? question.answers[0]
+              : String(question.answer);
+        const r = await request(
+          "packages/preview-answer",
+          {
+            pack: pack.id,
+            revision: detail.revision,
+            question: question.id,
+            value,
+          },
+          parent,
+        );
+        assert.equal(r.status, 200);
+        assert.equal(r.body.correct, true);
+        assert.ok(r.body.explanation);
+      }
+    }
+    assert.deepEqual(
+      (await request("state", undefined, student)).body,
+      snapshot,
+    );
+    assert.equal(
+      (
+        await request(
+          "packages/preview-answer",
+          {
+            pack: changed.id,
+            revision: 2,
+            question: changed.questions[0].id,
+            value: "wrong",
+          },
+          student,
+        )
+      ).status,
+      403,
+    );
+    for (const path of ["packages/assign", "packages/delete"])
+      assert.equal(
+        (await request(path, { pack: changed.id }, student)).status,
+        403,
+      );
+    // Ein unzugeordnetes Paket darf weder sichtbar sein noch direkt gestartet werden.
+    const privatePack = { ...structuredClone(packs[0]), id: "private-pack" };
+    assert.equal((await save(privatePack, parent)).status, 200);
+    assert.equal(
+      (await request("state", undefined, student)).body.packages.some(
+        (p) => p.id === privatePack.id,
+      ),
+      false,
+    );
+    assert.equal(
+      (await request("rounds", { pack: privatePack.id }, student)).status,
+      403,
+    );
+    assert.equal(
+      (
+        await request(
+          "packages/assign",
+          {
+            pack: privatePack.id,
+            children: ["demo-student"],
+            expectedRevision: 1,
+            expectedAssignedTo: [],
+          },
+          parent,
+        )
+      ).status,
+      200,
+    );
+    const active = (await request("rounds", { pack: privatePack.id }, student))
+      .body;
+    assert.equal(
+      (
+        await request(
+          "packages/delete",
+          {
+            pack: privatePack.id,
+            expectedRevision: 1,
+            expectedAssignedTo: ["demo-student"],
+          },
+          parent,
+        )
+      ).status,
+      409,
+    );
+    assert.equal(
+      (
+        await request(
+          "packages/assign",
+          {
+            pack: privatePack.id,
+            children: [],
+            expectedRevision: 1,
+            expectedAssignedTo: ["demo-student"],
+          },
+          parent,
+        )
+      ).status,
+      200,
+    );
+    assert.equal(
+      (
+        await request(
+          "rounds/answer",
+          { round: active.id, question: active.question.id, value: "x" },
+          student,
+        )
+      ).status,
+      403,
+    );
+    assert.equal(
+      (
+        await request(
+          "packages/delete",
+          { pack: privatePack.id, expectedRevision: 1, expectedAssignedTo: [] },
+          parent,
+        )
+      ).status,
+      200,
+    );
+    assert.equal(
+      (await request("packages/detail?id=" + privatePack.id, undefined, parent))
+        .status,
+      404,
     );
     await request("logout", {}, student);
     assert.equal((await request("state", undefined, student)).status, 401);

@@ -15,6 +15,7 @@ Die Anwendung lädt keine externen Schriftarten und enthält keine Trackingdiens
 ## Dateien und Verantwortlichkeiten
 
 - [server.mjs](../server.mjs): Schemaanlage, Sitzungen, Einladung, WebAuthn-Endpunkte, Rollen, Pakete, Runden und statische Dateien. `api` verteilt Anfragen; `state` liefert nur die jeweils erforderlichen Ansichten.
+- [package-store.mjs](../package-store.mjs): atomare Migration, Paketversionen, Inhaltsvergleich, Zuordnung, Exportdaten und Löschung.
 - [learning.mjs](../learning.mjs): `validatePack` prüft Uploads, `grade` bewertet Antworten, `advance` aktualisiert den Lernstand und `publicQuestion` entfernt Lösungsfelder.
 - [admin.mjs](../admin.mjs): Lokale Verwaltungsbefehle mit direktem Datenbankzugriff; nicht über die Webseite erreichbar.
 - [public/app.js](../public/app.js): Navigation, Formulare, Passkey-Browseraufrufe und Darstellung. Die verbindliche Bewertung erfolgt immer auf dem Server.
@@ -22,7 +23,7 @@ Die Anwendung lädt keine externen Schriftarten und enthält keine Trackingdiens
 
 ## Identität und Zugriffe
 
-Elternkonten verwalten die eigene Familie. Schüler sehen die Pakete ihrer Familie und nur ihren eigenen Lernstand. Die Familienzugehörigkeit kommt aus der serverseitigen Sitzung, nicht aus frei übermittelten Formularwerten.
+Elternkonten verwalten die eigene Familie. Schüler sehen nur die ihnen zugeordneten Pakete ihrer Familie und nur ihren eigenen Lernstand. Die Familienzugehörigkeit kommt aus der serverseitigen Sitzung, nicht aus frei übermittelten Formularwerten.
 
 Der erste Elternzugang benötigt den lokal erzeugten Setup-Token und eine leere Kontentabelle. Spätere Schülerzugänge verwenden kurzlebige Einladungslinks. Passkey-Challenges sind an einen Browser-Cookie gebunden, fünf Minuten gültig und werden bei der Prüfung einmalig verbraucht. Nutzerverifikation ist erforderlich. Die Anmeldung prüft Challenge, Signatur, externe Origin und Relying-Party-ID.
 
@@ -42,7 +43,9 @@ Die Datenbank speichert öffentliche Passkey-Schlüssel; biometrische Daten oder
 | `rounds`      | Aktuelle Warteschlange, Runde und Auswertung                               |
 | `attempts`    | Erste Antworten als richtig/falsch für Statistik und Lernpunkte            |
 
-Das Schema wird beim Start mit `CREATE TABLE IF NOT EXISTS` angelegt. Es gibt bislang kein versioniertes Migrationssystem. SQLite läuft mit WAL und Fremdschlüsselprüfung.
+Das Basisschema wird beim Start angelegt. `package-store.mjs` führt die einmalige Migration `package-management-v1` atomar aus und protokolliert sie in `schema_migrations`. `package_revisions` hält vollständige Inhaltsversionen je Familie und Paket, `package_assignments` die ausdrücklichen Kinderzuordnungen. Vorgehen und Rückweg stehen in [ELTERNBEREICH.md](ELTERNBEREICH.md). SQLite läuft mit WAL und Fremdschlüsselprüfung.
+
+Eltern können vollständige Inhalte einschließlich Lösungen und älterer Versionen abrufen. Schüler bekommen diese Endpunkte nicht freigegeben. Die Elternvorschau bewertet mit `grade`, ohne Runden, Fortschritt oder Antworten zu schreiben. Die Paketzuordnung wird auch beim Rundenstart und jeder Schülerantwort geprüft. Entzug beendet offene Runden als abgebrochen; Paketlöschung entfernt familienbegrenzt auch zugehörige Antworten und Runden.
 
 ## Ablauf einer Lernrunde
 
@@ -68,9 +71,9 @@ Richtig und falsch im Test beeinflussen denselben Lernstand wie erste Übungsant
 
 ## Paketaktualisierung
 
-Die Paket-ID bezeichnet das Paket innerhalb der Familie; die Aufgaben-ID bezeichnet eine Aufgabe darin. Ein unverändertes Aufgabenobjekt behält bei erneutem Import den Lernstand. Bei geänderten oder entfernten Aufgaben wird deren Lernstand zurückgesetzt. Aktuell vergleicht die App die serialisierten Aufgabenobjekte; auch eine andere Reihenfolge der JSON-Felder kann deshalb als Änderung gelten. Die Reihenfolge der Aufgaben selbst darf sich ändern.
+Die Paket-ID bezeichnet das Paket innerhalb der Familie; die Aufgaben-ID bezeichnet eine Aufgabe darin. Ein unverändertes Aufgabenobjekt behält bei erneutem Import den Lernstand. Bei geänderten oder entfernten Aufgaben wird deren Lernstand zurückgesetzt. Der Inhaltsvergleich ignoriert die Reihenfolge der Felder innerhalb von JSON-Objekten. Die Reihenfolge der Aufgaben selbst darf sich ändern.
 
-Ein Paket mit laufender Runde kann nicht geändert werden. Alle Schüler einer Familie erhalten automatisch alle freigegebenen Pakete. Eine Zuweisung einzelner Pakete an einzelne Kinder ist noch offen.
+Ein Paket mit laufender Runde kann inhaltlich nicht geändert werden. Identische Importe sind möglich und erzeugen keine neue Version. Eltern weisen Pakete ausdrücklich einzelnen Kindern zu. Gleichzeitige Änderungen aus veralteten Ansichten werden über die erwartete Inhaltsversion und bisherige Zuordnung abgefangen.
 
 ## Grenzen
 

@@ -8,7 +8,9 @@ Eltern können Inhalte mit einer beliebigen KI vorbereiten. Die App selbst benö
 2. Die KI ausschließlich eine JSON-Datei erzeugen lassen und diese als UTF-8 mit `.json` speichern.
 3. Im Elternkonto unter **Lernpakete** auswählen. Maximal 1 MB pro Datei, 1 bis 300 Aufgaben pro Paket.
 4. Nach der Formatprüfung Fragen und Lösungen in der Vorschau selbst fachlich prüfen.
-5. Freigeben. Das Paket erscheint bei allen Schülern der Familie.
+5. Änderungsvorschau prüfen, die gewünschten Kinder auswählen und speichern. Ohne Auswahl bleibt ein neues Paket nur im Elternbereich. Bei Updates sind bisherige Zuordnungen vorausgewählt.
+
+Versionen, Fragenvorschau, Export und Löschen sind in [ELTERNBEREICH.md](ELTERNBEREICH.md) beschrieben.
 
 Die automatische Prüfung bestätigt das Format, nicht die fachliche Richtigkeit. Persönliche Daten des Kindes gehören weder in den KI-Auftrag noch in das Paket.
 
@@ -78,6 +80,8 @@ Zwei bis sechs unterschiedliche Optionen; genau eine richtige Antwort. `correct`
 
 Vollständige Pakete liegen unter [examples/](../examples/). Die Datei [beispielpaket.json](../public/beispielpaket.json) wird in der Oberfläche zum Download angeboten. [create-demo.mjs](../examples/create-demo.mjs) enthält die Beispieldaten für den Demostart.
 
-Bei gleicher Paket-ID wird das vorhandene Paket ersetzt. Unveränderte Aufgaben-IDs samt identischem Aufgabenobjekt behalten den Lernstand. Änderungen an Lösungen, Erklärungen, Regeln oder Feldreihenfolge können den Lernstand zurücksetzen. Bei offenen Lernrunden wird ein Update des betroffenen Pakets abgewiesen.
+Bei gleicher Paket-ID wird das vorhandene Paket aktualisiert und der bisherige Inhalt als Version behalten. Identischer Inhalt erzeugt keine neue Version. Unveränderte Aufgaben-IDs samt identischem Aufgabenobjekt behalten den Lernstand. Änderungen an Lösungen, Erklärungen oder Regeln setzen ihn für die betroffenen Fragen zurück. Die Reihenfolge von JSON-Objektfeldern spielt dabei keine Rolle. Bei offenen Lernrunden wird eine Inhaltsänderung des betroffenen Pakets abgewiesen.
+
+Die Inhaltsversion vergibt die Anwendung; `version: 1` in JSON bleibt die Formatversion. Kinderzuordnungen werden im Elternkonto gewählt und sind kein Feld des Lernpakets.
 
 Für ein fachlich neues Thema eine neue Paket-ID verwenden. Für eine Korrektur am bestehenden Thema dieselbe ID behalten und die Änderung bewusst prüfen.

@@ -10,13 +10,8 @@ import {
   generateAuthenticationOptions,
   verifyAuthenticationResponse,
 } from "@simplewebauthn/server";
-import {
-  validatePack,
-  grade,
-  advance,
-  publicQuestion,
-  solution,
-} from "./learning.mjs";
+import { grade, advance, publicQuestion, solution } from "./learning.mjs";
+import { packageStore } from "./package-store.mjs";
 import { packs } from "./examples/create-demo.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
@@ -45,6 +40,7 @@ db.exec(`
  CREATE TABLE IF NOT EXISTS rounds(id TEXT PRIMARY KEY,user_id TEXT NOT NULL,pack TEXT NOT NULL,body TEXT NOT NULL,created INTEGER NOT NULL);
  CREATE TABLE IF NOT EXISTS attempts(id INTEGER PRIMARY KEY,user_id TEXT NOT NULL,pack TEXT NOT NULL,qid TEXT NOT NULL,correct INTEGER NOT NULL,created INTEGER NOT NULL);
 `);
+const managedPackages = packageStore(db);
 const uid = () => randomBytes(24).toString("base64url");
 const hash = (s) => createHash("sha256").update(s).digest("hex");
 const get = (sql, ...p) => db.prepare(sql).get(...p),
@@ -75,6 +71,8 @@ const packFor = (u, id) => {
     id,
   );
   if (!p) fail("Lernpaket nicht gefunden.", 404);
+  if (u.role === "student" && !managedPackages.canLearn(u, id))
+    fail("Dieses Lernpaket ist dir nicht zugeordnet.", 403);
   return JSON.parse(p.body);
 };
 const progressFor = (id, pack) =>
@@ -187,48 +185,6 @@ function registrationTarget(req, b) {
   }
   fail("Dieser Einrichtungslink ist ungültig oder abgelaufen.", 403);
 }
-function savePack(u, p) {
-  validatePack(p);
-  const active = get(
-    "SELECT id FROM rounds WHERE pack=? AND user_id IN (SELECT id FROM users WHERE family=?) AND json_extract(body,'$.done')=0",
-    p.id,
-    u.family,
-  );
-  if (active)
-    fail(
-      "Dieses Paket wird gerade bearbeitet. Bitte die Lernrunde zuerst beenden.",
-    );
-  transaction(() => {
-    const old = get(
-      "SELECT body FROM packages WHERE family=? AND id=?",
-      u.family,
-      p.id,
-    );
-    if (old) {
-      const before = JSON.parse(old.body);
-      const changed = before.questions
-        .filter(
-          (q) =>
-            JSON.stringify(q) !==
-            JSON.stringify(p.questions.find((n) => n.id === q.id)),
-        )
-        .map((q) => q.id);
-      for (const qid of changed)
-        run(
-          "DELETE FROM progress WHERE pack=? AND qid=? AND user_id IN (SELECT id FROM users WHERE family=?)",
-          p.id,
-          qid,
-          u.family,
-        );
-    }
-    run(
-      "INSERT OR REPLACE INTO packages VALUES(?,?,?)",
-      u.family,
-      p.id,
-      JSON.stringify(p),
-    );
-  });
-}
 function bootstrapDemo() {
   if (!DEMO) return;
   if (!get("SELECT id FROM users WHERE id='demo-parent'")) {
@@ -246,7 +202,14 @@ function bootstrapDemo() {
       "Alex",
       "student",
     );
-    for (const p of packs) savePack({ family: "demo" }, p);
+    for (const p of packs)
+      managedPackages.save(
+        { family: "demo", name: "Demo" },
+        p,
+        0,
+        ["demo-student"],
+        [],
+      );
   }
 }
 bootstrapDemo();
@@ -278,23 +241,27 @@ async function body(req) {
   }
 }
 function state(u) {
-  const packages = all(
-    "SELECT body FROM packages WHERE family=?",
-    u.family,
-  ).map((r) => {
-    const p = JSON.parse(r.body),
-      pr = progressFor(u.id, p.id);
-    return {
-      id: p.id,
-      title: p.title,
-      subject: p.subject,
-      topic: p.topic,
-      grade: p.grade,
-      total: p.questions.length,
-      learned: p.questions.filter((q) => pr[q.id]?.archived).length,
-      practiced: p.questions.filter((q) => pr[q.id]?.streak > 0).length,
-    };
-  });
+  const packages = all("SELECT body FROM packages WHERE family=?", u.family)
+    .filter(
+      (r) =>
+        u.role === "parent" ||
+        managedPackages.canLearn(u, JSON.parse(r.body).id),
+    )
+    .map((r) => {
+      const p = JSON.parse(r.body),
+        pr = progressFor(u.id, p.id);
+      return {
+        ...(u.role === "parent" ? managedPackages.metadata(u, p.id) : {}),
+        id: p.id,
+        title: p.title,
+        subject: p.subject,
+        topic: p.topic,
+        grade: p.grade,
+        total: p.questions.length,
+        learned: p.questions.filter((q) => pr[q.id]?.archived).length,
+        practiced: p.questions.filter((q) => pr[q.id]?.streak > 0).length,
+      };
+    });
   const stats = get(
     "SELECT count(*) answered, coalesce(sum(correct),0) correct FROM attempts WHERE user_id=?",
     u.id,
@@ -542,18 +509,57 @@ async function api(req, res, url) {
     return { token: invite(c.id) };
   }
   if (route === "/api/packages/validate" && req.method === "POST") {
-    parent(req);
-    validatePack(b);
-    return {
-      ok: true,
-      title: b.title,
-      subject: b.subject,
-      count: b.questions.length,
-    };
+    return managedPackages.plan(parent(req), b);
   }
   if (route === "/api/packages" && req.method === "POST") {
-    savePack(parent(req), b);
-    return { ok: true };
+    const u = parent(req);
+    return managedPackages.save(
+      u,
+      b.pack,
+      b.expectedRevision,
+      b.children,
+      b.expectedAssignedTo,
+    );
+  }
+  if (route === "/api/packages/detail" && req.method === "GET") {
+    return managedPackages.detail(
+      parent(req),
+      url.searchParams.get("id"),
+      url.searchParams.has("revision")
+        ? url.searchParams.get("revision")
+        : undefined,
+    );
+  }
+  if (route === "/api/packages/assign" && req.method === "POST") {
+    return managedPackages.assign(
+      parent(req),
+      b.pack,
+      b.children,
+      b.expectedRevision,
+      b.expectedAssignedTo,
+    );
+  }
+  if (route === "/api/packages/delete" && req.method === "POST") {
+    return managedPackages.remove(
+      parent(req),
+      b.pack,
+      b.expectedRevision,
+      b.expectedAssignedTo,
+    );
+  }
+  if (route === "/api/packages/preview-answer" && req.method === "POST") {
+    const u = parent(req);
+    if (!Number.isInteger(b.revision)) fail("Version fehlt.");
+    const detail = managedPackages.detail(u, b.pack, b.revision);
+    const q = detail.pack.questions.find((q) => q.id === b.question);
+    if (!q) fail("Frage nicht gefunden.", 404);
+    if (typeof b.value === "string" && b.value.length > 500)
+      fail("Die Antwort ist zu lang.");
+    return {
+      correct: grade(q, b.value),
+      solution: solution(q),
+      explanation: q.explanation,
+    };
   }
   if (route === "/api/progress/reset" && req.method === "POST") {
     const u = parent(req),

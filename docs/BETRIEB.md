@@ -70,7 +70,7 @@ git checkout DEIN-GEPRUEFTER-COMMIT
 docker compose up -d --build
 ```
 
-Das ändert nur die Anwendung. Bei einer künftig inkompatiblen Schemaänderung muss auch die passende Datenbanksicherung nach [WIEDERHERSTELLUNG.md](WIEDERHERSTELLUNG.md) eingespielt werden. Die erste Version führt noch keine versionierten Datenbankmigrationen.
+Das ändert nur die Anwendung. Bei einer künftig inkompatiblen Schemaänderung muss auch die passende Datenbanksicherung nach [WIEDERHERSTELLUNG.md](WIEDERHERSTELLUNG.md) eingespielt werden. Seit der Elternverwaltung gibt es die Migration `package-management-v1`. Für einen Rückweg zum älteren Code ist zwingend die zugehörige alte Datenbanksicherung nötig; Details in [ELTERNBEREICH.md](ELTERNBEREICH.md).
 
 ## Zugang verloren
 

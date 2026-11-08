@@ -29,7 +29,7 @@ const esc = (s) =>
       ],
   );
 const button = (label, act, extra = "", cls = "btn") =>
-  `<button class="${cls}" data-act="${act}" ${extra}>${label}</button>`;
+  `<button type="button" class="${cls}" data-act="${act}" ${extra}>${label}</button>`;
 const app = document.querySelector("#app");
 let state = null,
   view = "home",
@@ -89,6 +89,7 @@ function render() {
     ? [
         ["home", "Elternbereich", "home"],
         ["upload", "Lernpakete", "upload"],
+        ["review", "Fragen prüfen", "book"],
         ["settings", "Konten", "users"],
       ]
     : [
@@ -96,7 +97,9 @@ function render() {
         ["subjects", "Meine Fächer", "book"],
         ["badges", "Meine Erfolge", "award"],
       ];
-  const current = nav.find((n) => n[0] === view)?.[1] || "Deine Lernmission";
+  const current =
+    nav.find((n) => n[0] === view)?.[1] ||
+    (parent ? "Paket prüfen" : "Deine Lernmission");
   app.innerHTML = `${demo ? '<div class="demo-banner">Interaktive Demo · Nur Beispieldaten · Passkeys im Serverbetrieb</div>' : ""}<div class="shell"><aside class="sidebar">${brand()}<nav aria-label="Hauptnavigation">${nav.map(([id, label, ic]) => button(icon(ic) + `<span>${label}</span>`, "navigate", `data-view="${id}" ${view === id ? 'aria-current="page"' : ""}`, `nav-item ${view === id ? "active" : ""}`)).join("")}</nav><div class="sidebar-note">${icon("leaf")}<strong>In deinem Tempo.</strong>Jeder kleine Schritt zählt. Du musst nicht alles auf einmal können.</div><div class="account"><div class="avatar">${esc(state.user.name[0])}</div><div><strong>${esc(state.user.name)}</strong><small>${parent ? "Elternkonto" : "Deine Lernreise"}</small></div>${button(icon("logout"), "logout", 'aria-label="Abmelden"', "icon-button")}</div></aside><div class="workspace"><header class="topbar"><span class="breadcrumb">${parent ? "Familie" : "Dein Lernort"} &nbsp; / &nbsp; ${current}</span><div class="top-right">${!parent ? `<span class="xp">${icon("star")} ${state.stats.xp} Lernpunkte</span>` : ""}${demo ? button(parent ? "Zur Schüleransicht" : "Zum Elternbereich", "switch", "", "demo-switch") : button(icon("logout"), "logout", 'aria-label="Abmelden"', "icon-button")}</div></header><main id="main">${view === "quiz" ? quiz() : parent ? parentPage() : studentPage()}</main></div></div>`;
   app
     .querySelectorAll("[data-width]")
@@ -110,7 +113,7 @@ function studentPage() {
   if (view === "subjects")
     return `<div class="intro"><div><div class="eyebrow">Entdecken & verstehen</div><h1>Worauf bist du neugierig?</h1><p>Such dir ein Thema aus und leg in deinem Tempo los.</p></div></div><div class="filters">${["Alle", ...new Set(state.packages.map((p) => p.subject))].map((s) => button(esc(s), "filter", `data-filter="${esc(s)}" aria-pressed="${filter === s}"`, `filter ${filter === s ? "active" : ""}`)).join("")}</div>${cards(state.packages.filter((p) => filter === "Alle" || p.subject === filter))}`;
   const recommended = state.packages.find((p) => p.learned < p.total);
-  return `<div class="intro"><div><div class="eyebrow">Dein Kopf steckt voller Möglichkeiten</div><h1>Hey ${esc(state.user.name)}, bereit für Neues?</h1><p>Ein bisschen üben. Etwas entdecken. Und stolz auf dich sein.</p></div><span class="date-pill">${new Intl.DateTimeFormat("de-DE", { weekday: "short", day: "numeric", month: "long" }).format(new Date())}</span></div><section class="hero"><div><div class="eyebrow">Deine nächste Lernmission</div><h2>${recommended ? "Kleine Runde.<br>Großer Aha-Moment." : "Das sitzt. Gut gemacht!"}</h2><p>${recommended ? "Bis zu 10 Aufgaben aus „" + esc(recommended.title) + "“. Schau mal, was du schon kannst." : "Du hast alle aktuellen Aufgaben sicher gelernt. Zeit, stolz auf dich zu sein."}</p>${recommended ? button("Mission starten " + icon("arrow"), "start", `data-pack="${esc(recommended.id)}"`, "btn lime") : button("Meine Erfolge ansehen " + icon("arrow"), "navigate", 'data-view="badges"', "btn lime")}</div><div class="hero-art" aria-hidden="true"><div class="orbit"></div><div class="orbit second"></div><div class="planet">${icon("book")}</div><span class="spark">✦</span><span class="spark two">✧</span><span class="float-badge">Ein Schritt weiter. ✦</span></div></section><div class="stats">${stat(
+  return `<div class="intro"><div><div class="eyebrow">Dein Kopf steckt voller Möglichkeiten</div><h1>Hey ${esc(state.user.name)}, bereit für Neues?</h1><p>Ein bisschen üben. Etwas entdecken. Und stolz auf dich sein.</p></div><span class="date-pill">${new Intl.DateTimeFormat("de-DE", { weekday: "short", day: "numeric", month: "long" }).format(new Date())}</span></div><section class="hero"><div><div class="eyebrow">Deine nächste Lernmission</div><h2>${recommended ? "Kleine Runde.<br>Großer Aha-Moment." : state.packages.length ? "Das sitzt. Gut gemacht!" : "Deine Lernreise wartet."}</h2><p>${recommended ? "Bis zu 10 Aufgaben aus „" + esc(recommended.title) + "“. Schau mal, was du schon kannst." : state.packages.length ? "Du hast alle aktuellen Aufgaben sicher gelernt. Zeit, stolz auf dich zu sein." : "Dir ist noch kein Lernpaket zugeordnet. Deine Eltern können ein Thema für dich auswählen."}</p>${recommended ? button("Mission starten " + icon("arrow"), "start", `data-pack="${esc(recommended.id)}"`, "btn lime") : button("Meine Erfolge ansehen " + icon("arrow"), "navigate", 'data-view="badges"', "btn lime")}</div><div class="hero-art" aria-hidden="true"><div class="orbit"></div><div class="orbit second"></div><div class="planet">${icon("book")}</div><span class="spark">✦</span><span class="spark two">✧</span><span class="float-badge">Ein Schritt weiter. ✦</span></div></section><div class="stats">${stat(
     "check",
     state.packages.reduce((s, p) => s + p.learned, 0),
     "Aufgaben sicher gelernt",
@@ -129,12 +132,122 @@ function cards(packages) {
         .join("")}</div>`
     : '<div class="empty">Deine Lernwelten warten noch auf Inhalte.<br>Im Elternbereich lässt sich das erste Lernpaket hochladen.</div>';
 }
+let packageDetail = null,
+  previewIndex = 0,
+  previewFeedback = null,
+  previewChoice = null;
+let importPlan = null;
+const when = (value) =>
+  value
+    ? new Intl.DateTimeFormat("de-DE", {
+        dateStyle: "medium",
+        timeStyle: "short",
+        timeZone: "Europe/Berlin",
+      }).format(new Date(value))
+    : "Bestand übernommen · früheres Importdatum unbekannt";
+const solutionText = (q) =>
+  q.type === "choice"
+    ? q.options[q.correct]
+    : q.type === "number"
+      ? `${q.answer} ${q.unit}`
+      : q.answers.join(" / ");
+const assignedNames = (ids) =>
+  state.children
+    .filter((c) => ids.includes(c.id))
+    .map((c) => c.name)
+    .join(", ") || "Noch keinem Kind zugeordnet";
+function childChecks(ids, scope) {
+  return `<fieldset class="assignment-fields"><legend>Für welche Kinder?</legend>${state.children.map((c) => `<label class="check-label"><input type="checkbox" data-assignment="${scope}" value="${esc(c.id)}" ${ids.includes(c.id) ? "checked" : ""}><span>${esc(c.name)}</span></label>`).join("") || "<p>Unter „Konten“ zuerst ein Schülerkonto anlegen. Das Paket kann bereits gespeichert werden.</p>"}</fieldset>`;
+}
+const checkedChildren = (scope) =>
+  [...document.querySelectorAll(`[data-assignment="${scope}"]:checked`)].map(
+    (e) => e.value,
+  );
+function changeSummary(diff) {
+  return `${diff.added.length} neu · ${diff.changed.length} geändert · ${diff.removed.length} entfernt · ${diff.unchanged.length} unverändert`;
+}
+function changeList(diff) {
+  return `<p>${changeSummary(diff)}</p>${[
+    ["Neue Fragen", diff.added],
+    ["Geänderte Fragen", diff.changed],
+    ["Entfernte Fragen", diff.removed],
+  ]
+    .filter(([, qs]) => qs.length)
+    .map(
+      ([title, qs]) =>
+        `<details><summary>${title} (${qs.length})</summary><ul>${qs.map((q) => `<li>${esc(q.prompt)} <small>(${esc(q.id)})</small></li>`).join("")}</ul></details>`,
+    )
+    .join("")}`;
+}
+function questionList(questions, versions = {}) {
+  return `<div class="review-list">${questions.map((q, i) => `<details class="file-preview-item"><summary>${i + 1}. ${esc(q.prompt)}</summary>${versions[q.id] ? `<p class="tag">Zuletzt geändert in Version ${versions[q.id]}</p>` : ""}${q.options ? `<ol type="A">${q.options.map((o, n) => `<li>${esc(o)}${n === q.correct ? " ✓" : ""}</li>`).join("")}</ol>` : ""}<p><b>Lösung:</b> ${esc(solutionText(q))}</p><p>${esc(q.explanation)}</p>${q.type === "input" ? `<small>Großschreibung: ${q.caseSensitive ? "zählt" : "egal"} · Akzente: ${q.accentSensitive === false ? "egal" : "zählen"} · Satzzeichen: ${q.punctuationSensitive === false ? "egal" : "zählen"}</small>` : q.type === "number" ? `<small>Toleranz: ${esc(q.tolerance ?? 0)}</small>` : ""}<p><small>Fragen-ID: ${esc(q.id)}</small></p></details>`).join("")}</div>`;
+}
+function packageCards(reviewOnly = false) {
+  return state.packages.length
+    ? `<div class="subject-grid">${state.packages.map((p) => `<article class="subject-card"><div class="card-top"><span class="tag">${esc(p.subject)} · Klasse ${p.grade}</span><span class="tag">Version ${p.revision}</span></div><h3>${esc(p.title)}</h3><p>${esc(p.topic)}</p><p>${p.total} Fragen · ${esc(when(p.updatedAt))}</p><p><b>Zugeordnet:</b> ${esc(assignedNames(p.assignedTo))}</p><div class="package-actions">${button(reviewOnly ? "Fragen ansehen und ausprobieren" : "Verwalten und Fragen prüfen", "package-open", `data-pack="${esc(p.id)}"`, "btn light")}</div></article>`).join("")}</div>`
+    : '<div class="empty">Noch keine Lernpakete vorhanden. Unter „Lernpakete“ kannst du eine JSON-Datei importieren.</div>';
+}
+function packagesPage() {
+  return `<div class="intro"><div><div class="eyebrow">Inhalte und Freigaben</div><h1>Deine Lernpakete.</h1><p>Prüfe Versionen und Fragen. Du entscheidest, welches Kind welches Paket sieht.</p></div></div><section class="panel"><h2>Lernpaket importieren</h2><label class="dropzone" for="packfile">${icon("upload")}<strong>JSON-Datei auswählen</strong><span>Bis 1 MB · Formatversion 1</span></label><input type="file" id="packfile" accept=".json,application/json" aria-label="Lernpaket als JSON auswählen"><div id="upload-preview"></div><div class="tools"><a href="/KI-VORLAGE.md" download>KI-Vorlage</a><a href="/beispielpaket.json" download>Beispielpaket</a></div></section><div class="section-heading"><h2>Gespeicherte Pakete (${state.packages.length})</h2></div>${packageCards()}<div class="help space-top">Ein Paket kann mehreren Kindern zugeordnet werden. Jedes Kind hat seinen eigenen Lernstand. Kindernamen stehen nicht in der JSON-Datei. Neue Pakete sind ohne Auswahl zunächst nur im Elternbereich sichtbar.</div>`;
+}
+async function openPackage(id, revision) {
+  packageDetail = await api(
+    `packages/detail?id=${encodeURIComponent(id)}${revision ? `&revision=${revision}` : ""}`,
+  );
+  view = "package";
+  render();
+  window.scrollTo(0, 0);
+}
+function packagePage() {
+  const d = packageDetail,
+    p = d.pack,
+    old = d.revision !== d.currentRevision;
+  return `<div class="intro"><div><div class="eyebrow">${esc(p.subject)} · Klasse ${p.grade}</div><h1>${esc(p.title)}</h1><p>Version ${d.revision}${old ? ` · Älterer Stand, aktuell ist Version ${d.currentRevision}` : " · Aktueller Stand"} · ${esc(when(d.created))}</p><p>${esc(p.topic)}</p><small>Paket-ID: ${esc(p.id)}</small></div></div><div class="package-actions">${button("Zur Paketübersicht", "navigate", 'data-view="upload"', "btn light")}${button("Alle Fragen ausprobieren", "preview-start")}${button("Diese Version als JSON herunterladen", "package-export", "", "btn light")}</div>${old ? `<div class="help space-top">Du siehst eine frühere Inhaltsversion. Zuordnung und Löschen sind nur beim aktuellen Stand möglich. ${button("Aktuelle Version öffnen", "package-open", `data-pack="${esc(p.id)}"`, "btn light small")}</div>` : `<section class="panel space-top"><h2>Zuordnung zu Kindern</h2><p>Aktuell: ${esc(assignedNames(d.assignedTo))}</p>${childChecks(d.assignedTo, "detail")}${button("Zuordnung speichern", "package-assign")}<p class="space-top">Ohne Häkchen bleibt das Paket nur im Elternbereich. Entfernen einer Zuordnung beendet offene Runden dieses Pakets; bisherige Lernstände bleiben für eine spätere Freigabe erhalten.</p></section>`}<section class="panel space-top"><h2>Versionsverlauf</h2><p>Gleiche Paket-ID: bestehendes Paket aktualisieren. Identischer Inhalt: keine neue Version. Die Formatversion 1 in der Datei ist davon unabhängig.</p><label class="form-field">Version ansehen<select id="package-version">${d.history.map((h) => `<option value="${h.revision}" ${h.revision === d.revision ? "selected" : ""}>Version ${h.revision} · ${esc(when(h.created))}</option>`).join("")}</select></label>${d.history
+    .filter((h) => h.revision === d.revision)
+    .map(
+      (h) =>
+        `<p>${h.actor ? `Importiert von ${esc(h.actor)}` : "Bei Einführung der Versionsverwaltung übernommen"}</p>${changeList(h.changes)}`,
+    )
+    .join(
+      "",
+    )}</section><section class="panel space-top"><h2>Alle ${p.questions.length} Fragen mit Lösungen</h2><p>Zum Lesen aufklappen oder oben ohne sichtbare Lösung ausprobieren. Die Vorschau verändert keine Schülerdaten.</p>${questionList(p.questions, d.questionVersions)}</section>${old ? "" : `<section class="panel space-top"><h2>Paket löschen</h2><p>Entfernt dieses Paket samt Versionsverlauf, Zuordnungen, Lernständen und bisherigen Antworten für alle Kinder deiner Familie. Dadurch ändern sich auch deren Statistiken und Lernpunkte. Wenn du es nur ausblenden möchtest, entferne stattdessen die Zuordnungen.</p>${button("Paket endgültig löschen", "package-delete", "", "btn danger")}</section>`}`;
+}
+function previewPage() {
+  const d = packageDetail,
+    q = d.pack.questions[previewIndex];
+  return `<section class="quiz"><div class="quiz-header"><span>Elternvorschau · Version ${d.revision}</span>${button("Vorschau beenden", "preview-close", "", "btn light small")}</div><div class="help">${esc(d.pack.title)} · Alle Fragen in Dateireihenfolge. Keine Lernpunkte, keine Änderungen am Lernstand der Kinder.</div><article class="question-card"><label class="form-field">Frage auswählen<select id="preview-jump">${d.pack.questions.map((x, i) => `<option value="${i}" ${i === previewIndex ? "selected" : ""}>${i + 1}. ${esc(x.prompt.slice(0, 90))}</option>`).join("")}</select></label><div class="eyebrow">Frage ${previewIndex + 1} von ${d.pack.questions.length} · Zuletzt geändert in Version ${d.questionVersions[q.id] || d.revision}</div><h2 id="preview-question">${esc(q.prompt)}</h2><form id="preview-form">${q.type === "choice" ? `<div class="choices" role="group" aria-labelledby="preview-question">${q.options.map((o, i) => button(`<span>${String.fromCharCode(65 + i)}</span>${esc(o)}`, "preview-choose", `data-choice="${i}" aria-pressed="${previewChoice === i}" ${previewFeedback ? "disabled" : ""}`, `choice ${previewChoice === i ? "selected" : ""}`)).join("")}</div>` : `<label class="form-field">Deine Antwort${q.unit ? ` in ${esc(q.unit)}` : ""}<input id="preview-answer" maxlength="500" autocomplete="off" ${q.type === "number" ? 'inputmode="decimal"' : ""} ${previewFeedback ? "disabled" : ""}></label>`}${previewFeedback ? `<div class="feedback ${previewFeedback.correct ? "success" : ""}" role="status"><strong>${previewFeedback.correct ? "Richtig beantwortet." : "Diese Antwort passt noch nicht."}</strong><p><b>Lösung:</b> ${esc(previewFeedback.solution)}</p><p>${esc(previewFeedback.explanation)}</p></div>` : '<button type="submit" class="btn space-top">Antwort prüfen</button>'}</form><div class="package-actions space-top">${button("Zurück", "preview-step", `data-step="-1" ${previewIndex === 0 ? "disabled" : ""}`, "btn light")}${button("Erneut versuchen", "preview-retry", "", "btn light")}${previewIndex + 1 < d.pack.questions.length ? button("Nächste Frage", "preview-step", 'data-step="1"') : button("Zur Fragenübersicht", "preview-close")}</div></article></section>`;
+}
+
 function parentPage() {
-  if (view === "upload")
-    return `<div class="intro"><div><div class="eyebrow">Neue Entdeckungen vorbereiten</div><h1>Ein Paket voller Wissen.</h1><p>Mit KI vorbereiten, hier prüfen und für dein Kind freigeben.</p></div></div><div class="parent-grid"><section class="panel"><h2>Lernpaket hochladen</h2><label class="dropzone" for="packfile">${icon("upload")}<strong>Ein neues Thema mitbringen</strong><span>JSON-Datei · bis 1 MB · Formatversion 1</span></label><input type="file" id="packfile" accept=".json,application/json" aria-label="Lernpaket als JSON auswählen"><div id="upload-preview"></div></section><section class="panel"><div class="eyebrow">So funktioniert’s</div><h2>Von der Idee zur Lernrunde</h2><p>1. Vorlage herunterladen und zusammen mit deinem Lernstoff einer KI geben.</p><p>2. Die erzeugte JSON-Datei auswählen. Die Webseite prüft das Format.</p><p>3. Fragen und Lösungen in der Vorschau durchsehen und das Paket freigeben.</p><div class="tools"><a href="/KI-VORLAGE.md" download>KI-Vorlage herunterladen</a><a href="/beispielpaket.json" download>Beispielpaket herunterladen</a></div><div class="help space-top">Freigegebene Pakete stehen allen Schülerkonten deiner Familie zur Verfügung. Bei gleicher Paket-ID wird das Paket aktualisiert. Unveränderte Aufgaben behalten ihren Lernstand; geänderte Aufgaben beginnen neu.</div></section></div>`;
+  if (view === "upload") return packagesPage();
+  if (view === "review")
+    return `<div class="intro"><div><h1>Fragen selbst ausprobieren.</h1><p>Wähle ein Paket. Du kannst alle Fragen ansehen oder ohne sichtbare Lösungen beantworten. Schülerdaten bleiben unverändert.</p></div></div>${packageCards(true)}`;
+  if (view === "package") return packagePage();
+  if (view === "preview") return previewPage();
   if (view === "settings")
     return `<div class="intro"><div><div class="eyebrow">Deine Familie</div><h1>Ein eigener Zugang für alle.</h1><p>Jedes Kind lernt mit seinem eigenen Konto und Lernstand.</p></div></div><div class="parent-grid"><section class="panel"><h2>Schülerkonto anlegen</h2><label class="form-field">Vorname<input id="child-name" maxlength="60" autocomplete="off" placeholder="Wie heißt dein Kind?"></label>${button("Einrichtungslink erstellen " + icon("arrow"), "create-child", demo ? "disabled" : "")}<div id="invite-result"></div><p class="space-top">Der Link gilt 30 Minuten. Öffne ihn auf dem Gerät des Kindes, um dort den ersten Passkey einzurichten.</p>${demo ? '<div class="help">In dieser Demo sind Kontenerstellung und Passkeys deaktiviert. Du kannst beide Ansichten mit Beispieldaten ausprobieren.</div>' : ""}</section><section class="panel"><h2>Bestehende Konten</h2>${state.children.map((c) => `<div class="child-row"><h3>${esc(c.name)}</h3><p>Schülerkonto · eigener Lernfortschritt</p>${button("Weiteren Passkey einrichten", "invite", `data-child="${c.id}" ${demo ? "disabled" : ""}`, "btn light small")}</div>`).join("") || "<p>Noch kein Schülerkonto angelegt.</p>"}<div class="space-top">${button(icon("key") + " Eigenen Passkey ergänzen", "add-passkey", demo ? "disabled" : "", "btn light small")}</div><p class="space-top">Ein zweiter Passkey ist ein Ersatz, falls ein Gerät verloren geht. Bei verlorenem Elternzugang hilft die Wiederherstellung über den Server, siehe Anleitung.</p><div id="existing-invite"></div></section></div>`;
-  return `<div class="intro"><div><div class="eyebrow">Begleiten statt vergleichen</div><h1>Platz für kleine Fortschritte.</h1><p>Hier siehst du, was schon klappt und wo noch Übung hilft.</p></div></div><section class="hero"><div><div class="eyebrow">Gemeinsam auf Lernreise</div><h2>Neues Wissen beginnt<br>mit einer guten Frage.</h2><p>Bereite ein Thema vor. Dein Kind entdeckt den Rest Schritt für Schritt.</p>${button("Lernpaket hinzufügen " + icon("upload"), "navigate", 'data-view="upload"', "btn lime")}</div><div class="hero-art" aria-hidden="true"><div class="orbit"></div><div class="planet">${icon("leaf")}</div><span class="spark">✦</span></div></section><div class="section-heading"><h2>So läuft die Lernreise</h2><p>${state.children.length} Schülerkonto${state.children.length === 1 ? "" : "en"}</p></div>${state.children.map((c) => `<section class="panel"><div class="inline"><div class="avatar">${esc(c.name[0])}</div><h3>${esc(c.name)}</h3></div><div class="stats space-top">${stat("book", c.answered, "Aufgaben ausprobiert")}${stat("check", c.correct, "Beim ersten Versuch richtig")}${stat("award", c.learned, "Aufgaben sicher gelernt")}</div><details><summary>Lernpaket erneut üben lassen</summary><p class="space-top">Setzt den Lernstand für dieses Paket zurück. Bisherige Antworten bleiben in der Statistik erhalten.</p><label class="form-field">Lernpaket<select id="reset-${c.id}">${state.packages.map((p) => `<option value="${esc(p.id)}">${esc(p.title)}</option>`).join("")}</select></label>${button("Lernstand zurücksetzen", "reset", `data-child="${c.id}"`, "btn light small")}</details></section>`).join("") || '<div class="empty">Lege unter „Konten“ das erste Schülerkonto an.</div>'}<div class="help">Eine Aufgabe gilt nach richtigen Antworten an drei verschiedenen Tagen als gelernt. Fehler führen zu mehr Übung. Im Test erfolgt die Rückmeldung erst am Ende. Lernpunkte belohnen auch das Ausprobieren.</div>`;
+  return `<div class="intro"><div><div class="eyebrow">Begleiten statt vergleichen</div><h1>Platz für kleine Fortschritte.</h1><p>Hier siehst du, was schon klappt und wo noch Übung hilft.</p></div></div><section class="hero"><div><div class="eyebrow">Gemeinsam auf Lernreise</div><h2>Neues Wissen beginnt<br>mit einer guten Frage.</h2><p>Bereite ein Thema vor. Dein Kind entdeckt den Rest Schritt für Schritt.</p>${button("Lernpaket hinzufügen " + icon("upload"), "navigate", 'data-view="upload"', "btn lime")}</div><div class="hero-art" aria-hidden="true"><div class="orbit"></div><div class="planet">${icon("leaf")}</div><span class="spark">✦</span></div></section><div class="section-heading"><h2>So läuft die Lernreise</h2><p>${state.children.length} Schülerkonto${state.children.length === 1 ? "" : "en"}</p></div>${
+    state.children
+      .map(
+        (c) =>
+          `<section class="panel"><div class="inline"><div class="avatar">${esc(c.name[0])}</div><h3>${esc(c.name)}</h3></div><div class="stats space-top">${stat("book", c.answered, "Aufgaben ausprobiert")}${stat("check", c.correct, "Beim ersten Versuch richtig")}${stat("award", c.learned, "Aufgaben sicher gelernt")}</div><div class="space-top"><h4>Zugeordnete Lernpakete</h4>${
+            state.packages
+              .filter((p) => p.assignedTo.includes(c.id))
+              .map(
+                (p) =>
+                  `<p>${button(esc(p.title) + ` · Version ${p.revision}`, "package-open", `data-pack="${esc(p.id)}"`, "btn light small")}</p>`,
+              )
+              .join("") || "<p>Noch kein Lernpaket zugeordnet.</p>"
+          }${button("Zuordnungen verwalten", "navigate", 'data-view="upload"', "btn quiet small")}</div><details><summary>Lernpaket erneut üben lassen</summary><p class="space-top">Setzt den Lernstand für dieses Paket zurück. Bisherige Antworten bleiben in der Statistik erhalten.</p><label class="form-field">Lernpaket<select id="reset-${c.id}">${state.packages
+            .filter((p) => p.assignedTo.includes(c.id))
+            .map((p) => `<option value="${esc(p.id)}">${esc(p.title)}</option>`)
+            .join(
+              "",
+            )}</select></label>${button("Lernstand zurücksetzen", "reset", `data-child="${c.id}"`, "btn light small")}</details></section>`,
+      )
+      .join("") ||
+    '<div class="empty">Lege unter „Konten“ das erste Schülerkonto an.</div>'
+  }<div class="help">Eine Aufgabe gilt nach richtigen Antworten an drei verschiedenen Tagen als gelernt. Fehler führen zu mehr Übung. Im Test erfolgt die Rückmeldung erst am Ende. Lernpunkte belohnen auch das Ausprobieren.</div>`;
 }
 function quiz() {
   if (round.done && !feedback) return results();
@@ -316,12 +429,106 @@ document.addEventListener("click", async (e) => {
       const r = await api("invite", { child: b.dataset.child });
       showInvite("existing-invite", r.token);
     }
+    if (act === "package-open") await openPackage(b.dataset.pack);
+    if (act === "package-assign") {
+      await api("packages/assign", {
+        pack: packageDetail.pack.id,
+        children: checkedChildren("detail"),
+        expectedRevision: packageDetail.currentRevision,
+        expectedAssignedTo: packageDetail.assignedTo,
+      });
+      const id = packageDetail.pack.id;
+      state = await api("state");
+      await openPackage(id);
+      toast(
+        "Zuordnung gespeichert. Jedes Kind behält seinen eigenen Lernstand.",
+      );
+    }
+    if (act === "package-delete") {
+      if (
+        confirm(
+          `„${packageDetail.pack.title}“ endgültig für die ganze Familie löschen? Alle Versionen, Zuordnungen, Lernstände, Runden und Antworten dieses Pakets werden entfernt. Lernpunkte und Statistiken ändern sich entsprechend.`,
+        )
+      ) {
+        await api("packages/delete", {
+          pack: packageDetail.pack.id,
+          expectedRevision: packageDetail.currentRevision,
+          expectedAssignedTo: packageDetail.assignedTo,
+        });
+        packageDetail = null;
+        view = "upload";
+        await load();
+        toast("Lernpaket gelöscht.");
+      }
+    }
+    if (act === "package-export") {
+      const url = URL.createObjectURL(
+        new Blob([JSON.stringify(packageDetail.pack, null, 2) + "\n"], {
+          type: "application/json",
+        }),
+      );
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${packageDetail.pack.id}-v${packageDetail.revision}.json`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+    if (act === "preview-start") {
+      previewIndex = 0;
+      previewFeedback = null;
+      previewChoice = null;
+      view = "preview";
+      render();
+    }
+    if (act === "preview-close") {
+      view = "package";
+      render();
+    }
+    if (act === "preview-choose") {
+      previewChoice = Number(b.dataset.choice);
+      document.querySelectorAll('[data-act="preview-choose"]').forEach((x) => {
+        x.classList.toggle(
+          "selected",
+          Number(x.dataset.choice) === previewChoice,
+        );
+        x.setAttribute(
+          "aria-pressed",
+          String(Number(x.dataset.choice) === previewChoice),
+        );
+      });
+    }
+    if (act === "preview-step" || act === "preview-retry") {
+      if (act === "preview-step")
+        previewIndex = Math.max(
+          0,
+          Math.min(
+            packageDetail.pack.questions.length - 1,
+            previewIndex + Number(b.dataset.step),
+          ),
+        );
+      previewChoice = null;
+      previewFeedback = null;
+      render();
+    }
     if (act === "import") {
-      await api("packages", pendingPack);
+      if (!pendingPack || !importPlan)
+        throw Error("Bitte zuerst eine Datei prüfen.");
+      const result = await api("packages", {
+        pack: pendingPack,
+        expectedRevision: importPlan.currentRevision,
+        expectedAssignedTo: importPlan.assignedTo,
+        children: checkedChildren("import"),
+      });
+      const id = pendingPack.id;
       pendingPack = null;
-      view = "home";
-      await load();
-      toast("Das Lernpaket ist freigegeben. Gute Reise!");
+      importPlan = null;
+      state = await api("state");
+      await openPackage(id);
+      toast(
+        result.kind === "unchanged"
+          ? `Inhalt unverändert · Version ${result.revision}. Zuordnung gespeichert.`
+          : `Gespeichert als Version ${result.revision}.`,
+      );
     }
     if (act === "reset") {
       const pack = document.getElementById("reset-" + b.dataset.child)?.value;
@@ -387,20 +594,91 @@ document.addEventListener("submit", async (e) => {
   }
 });
 document.addEventListener("change", async (e) => {
+  if (e.target.id === "package-version") {
+    try {
+      await openPackage(packageDetail.pack.id, e.target.value);
+    } catch (err) {
+      toast(err.message);
+    }
+    return;
+  }
+  if (e.target.id === "preview-jump") {
+    previewIndex = Number(e.target.value);
+    previewFeedback = null;
+    previewChoice = null;
+    render();
+    return;
+  }
   if (e.target.id !== "packfile") return;
   pendingPack = null;
-  const target = document.querySelector("#upload-preview");
-  const f = e.target.files[0];
+  importPlan = null;
+  const target = document.querySelector("#upload-preview"),
+    f = e.target.files[0];
+  target.innerHTML = "";
   if (!f) return;
+  const input = e.target;
+  input.disabled = true;
   try {
     if (f.size > 1024 * 1024)
       throw Error("Die Datei darf höchstens 1 MB groß sein.");
-    const p = JSON.parse(await f.text());
-    const result = await api("packages/validate", p);
+    const p = JSON.parse(await f.text()),
+      result = await api("packages/validate", p);
+    if (!target.isConnected) return;
     pendingPack = p;
-    target.innerHTML = `<div class="preview"><div class="eyebrow">Format geprüft · Bitte Inhalte prüfen</div><h3>${esc(result.title)}</h3><p>${esc(result.subject)} · ${result.count} Aufgaben · Klasse ${p.grade}</p><div class="review-list">${p.questions.map((q) => `<details class="file-preview-item"><summary>${esc(q.prompt)}</summary><p><b>Lösung:</b> ${esc(q.type === "choice" ? q.options[q.correct] : q.type === "number" ? q.answer + " " + q.unit : q.answers.join(" / "))}</p><p>${esc(q.explanation)}</p><small>${q.type === "choice" ? "Auswahl: " + esc(q.options.join(" · ")) : q.type === "input" ? "Großschreibung: " + (q.caseSensitive ? "zählt" : "egal") + " · Akzente: " + (q.accentSensitive === false ? "egal" : "zählen") : "Toleranz: " + esc(q.tolerance ?? 0)}</small></details>`).join("")}</div><div class="space-top">${button("Prüfung abgeschlossen · Freigeben " + icon("check"), "import")}</div><p class="space-top">Eine bestehende Paket-ID aktualisiert das bisherige Paket.</p></div>`;
+    importPlan = result;
+    const notice =
+      result.kind === "new"
+        ? "Neues Paket · Version 1"
+        : result.kind === "unchanged"
+          ? `Identischer Inhalt · Version ${result.currentRevision} bleibt erhalten`
+          : `Aktualisiert „${result.previousTitle}“ von Version ${result.currentRevision} auf ${result.nextRevision}`;
+    target.innerHTML = `<div class="preview"><h3>${esc(p.title)}</h3><p><b>${esc(notice)}</b></p><p>${esc(p.subject)} · ${p.questions.length} Fragen · Paket-ID: ${esc(p.id)}</p>${changeList(result.changes)}<p>Unveränderte Fragen behalten ihren Lernstand. Geänderte und neue Fragen beginnen neu; entfernte Fragen verschwinden aus dem aktuellen Lernstand.</p>${childChecks(result.assignedTo, "import")}<p>Ohne Auswahl bleibt das Paket nur im Elternbereich. Bei einem Update sind die bisherigen Kinder vorausgewählt.</p><details><summary>Alle Fragen und Lösungen vor dem Speichern prüfen</summary>${questionList(p.questions)}</details><div class="space-top">${button(result.kind === "update" ? `Als Version ${result.nextRevision} speichern` : result.kind === "unchanged" ? "Zuordnung bestätigen" : "Paket speichern", "import")}</div></div>`;
   } catch (err) {
     target.innerHTML = `<p class="error-text" role="alert">${esc(err instanceof SyntaxError ? "Die Datei enthält kein gültiges JSON." : err.message)}</p>`;
+  } finally {
+    input.disabled = false;
+  }
+});
+document.addEventListener("submit", async (e) => {
+  if (e.target.id !== "preview-form") return;
+  e.preventDefault();
+  if (busy || previewFeedback) return;
+  const q = packageDetail.pack.questions[previewIndex];
+  const value =
+    q.type === "choice"
+      ? previewChoice
+      : document.querySelector("#preview-answer").value;
+  if (value === null || (typeof value === "string" && !value.trim())) {
+    toast("Gib zuerst eine Antwort ein.");
+    return;
+  }
+  busy = true;
+  const submit = e.target.querySelector('[type="submit"]');
+  submit.disabled = true;
+  const detail = packageDetail,
+    index = previewIndex;
+  try {
+    const result = await api("packages/preview-answer", {
+      pack: detail.pack.id,
+      revision: detail.revision,
+      question: q.id,
+      value,
+    });
+    if (
+      view === "preview" &&
+      packageDetail === detail &&
+      previewIndex === index
+    ) {
+      previewFeedback = result;
+      render();
+      if (document.querySelector("#preview-answer"))
+        document.querySelector("#preview-answer").value = value;
+    }
+  } catch (err) {
+    toast(err.message);
+  } finally {
+    busy = false;
+    submit.disabled = false;
   }
 });
 (async () => {

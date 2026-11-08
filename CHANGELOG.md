@@ -1,5 +1,14 @@
 # Änderungen
 
+## 0.2.0 – Übersichtliche Elternverwaltung
+
+- Pakete gezielt einem oder mehreren Kindern zuordnen; neue Inhalte zunächst ohne Freigabe.
+- Inhaltsversion, Importzeit, Änderungsvorschau und vollständige frühere Versionen anzeigen.
+- Fragen samt Änderungsstand lesen oder als Eltern ohne Schülerdatenänderung ausprobieren.
+- Aktuelle und frühere Versionen als JSON exportieren; Pakete nach Bestätigung familienweit löschen.
+- Bestehende Freigaben einmalig und atomar migrieren; Rückweg mit alter Sicherung dokumentieren.
+- Schutz vor veralteten Importen und Zuordnungen, serverseitige Zugriffsprüfung sowie zusätzliche Integrations- und Migrationstests.
+
 ## Betrieb hinter bestehendem Apache
 
 - Eigenständige Compose-Datei ohne Caddy, nur auf Loopback-Port 18080 veröffentlicht.
