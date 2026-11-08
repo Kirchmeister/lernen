@@ -1,0 +1,22 @@
+{
+  "name": "lernreise",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "DEMO_MODE=true PORT=3000 HOST=0.0.0.0 DATA_PATH=./data/preview.sqlite node server.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "check": "bash scripts/check.sh",
+    "format": "prettier --write \"*.mjs\" \"public/*.{js,css,html}\" \"tests/*.mjs\" \"examples/create-demo.mjs\" \"*.{json,yaml,md}\" \"docs/*.md\" \".github/workflows/*.yml\""
+  },
+  "dependencies": {
+    "@simplewebauthn/server": "14.1.0"
+  },
+  "devDependencies": {
+    "prettier": "3.6.2"
+  }
+}

@@ -1,0 +1,15 @@
+node_modules
+data
+.env
+*.zip
+.git
+.github
+backups
+*.sqlite*
+*.db*
+*.tar.gz
+*.log
+.env.*
+!.env.example
+__pycache__
+*.pyc

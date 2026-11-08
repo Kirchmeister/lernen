@@ -1,0 +1,142 @@
+{
+  "version": 1,
+  "id": "english-everyday",
+  "title": "Hello, Alltag!",
+  "subject": "Englisch",
+  "topic": "Wörter für deinen Tag",
+  "grade": 7,
+  "questions": [
+    {
+      "id": "apple",
+      "type": "input",
+      "prompt": "Wie heißt „Apfel“ auf Englisch?",
+      "answers": [
+        "apple"
+      ],
+      "explanation": "„Apfel“ heißt auf Englisch „apple“.",
+      "accentSensitive": true,
+      "caseSensitive": false
+    },
+    {
+      "id": "school",
+      "type": "input",
+      "prompt": "Wie heißt „Schule“ auf Englisch?",
+      "answers": [
+        "school"
+      ],
+      "explanation": "„Schule“ heißt auf Englisch „school“.",
+      "accentSensitive": true,
+      "caseSensitive": false
+    },
+    {
+      "id": "friend",
+      "type": "input",
+      "prompt": "Wie heißt „Freund / Freundin“ auf Englisch?",
+      "answers": [
+        "friend"
+      ],
+      "explanation": "„Freund / Freundin“ heißt auf Englisch „friend“.",
+      "accentSensitive": true,
+      "caseSensitive": false
+    },
+    {
+      "id": "window",
+      "type": "input",
+      "prompt": "Wie heißt „Fenster“ auf Englisch?",
+      "answers": [
+        "window"
+      ],
+      "explanation": "„Fenster“ heißt auf Englisch „window“.",
+      "accentSensitive": true,
+      "caseSensitive": false
+    },
+    {
+      "id": "breakfast",
+      "type": "input",
+      "prompt": "Wie heißt „Frühstück“ auf Englisch?",
+      "answers": [
+        "breakfast"
+      ],
+      "explanation": "„Frühstück“ heißt auf Englisch „breakfast“.",
+      "accentSensitive": true,
+      "caseSensitive": false
+    },
+    {
+      "id": "library",
+      "type": "input",
+      "prompt": "Wie heißt „Bücherei“ auf Englisch?",
+      "answers": [
+        "library"
+      ],
+      "explanation": "„Bücherei“ heißt auf Englisch „library“.",
+      "accentSensitive": true,
+      "caseSensitive": false
+    },
+    {
+      "id": "homework",
+      "type": "input",
+      "prompt": "Wie heißt „Hausaufgaben“ auf Englisch?",
+      "answers": [
+        "homework"
+      ],
+      "explanation": "„Hausaufgaben“ heißt auf Englisch „homework“.",
+      "accentSensitive": true,
+      "caseSensitive": false
+    },
+    {
+      "id": "garden",
+      "type": "input",
+      "prompt": "Wie heißt „Garten“ auf Englisch?",
+      "answers": [
+        "garden"
+      ],
+      "explanation": "„Garten“ heißt auf Englisch „garden“.",
+      "accentSensitive": true,
+      "caseSensitive": false
+    },
+    {
+      "id": "bicycle",
+      "type": "input",
+      "prompt": "Wie heißt „Fahrrad“ auf Englisch?",
+      "answers": [
+        "bicycle"
+      ],
+      "explanation": "„Fahrrad“ heißt auf Englisch „bicycle“.",
+      "accentSensitive": true,
+      "caseSensitive": false
+    },
+    {
+      "id": "because",
+      "type": "input",
+      "prompt": "Wie heißt „weil“ auf Englisch?",
+      "answers": [
+        "because"
+      ],
+      "explanation": "„weil“ heißt auf Englisch „because“.",
+      "accentSensitive": true,
+      "caseSensitive": false
+    },
+    {
+      "id": "always",
+      "type": "input",
+      "prompt": "Wie heißt „immer“ auf Englisch?",
+      "answers": [
+        "always"
+      ],
+      "explanation": "„immer“ heißt auf Englisch „always“.",
+      "accentSensitive": true,
+      "caseSensitive": false
+    },
+    {
+      "id": "sometimes",
+      "type": "input",
+      "prompt": "Wie heißt „manchmal“ auf Englisch?",
+      "answers": [
+        "sometimes"
+      ],
+      "explanation": "„manchmal“ heißt auf Englisch „sometimes“.",
+      "accentSensitive": true,
+      "caseSensitive": false
+    }
+  ]
+}

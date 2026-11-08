@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "id": "physics-energy",
+  "title": "Energie entdecken",
+  "subject": "Physik",
+  "topic": "Energie und Bewegung",
+  "grade": 7,
+  "questions": [
+    {
+      "id": "energy-unit",
+      "type": "choice",
+      "prompt": "In welcher Einheit wird Energie angegeben?",
+      "options": [
+        "Joule",
+        "Meter",
+        "Sekunde",
+        "Grad Celsius"
+      ],
+      "correct": 0,
+      "explanation": "Energie wird in Joule (J) angegeben. Meter ist eine Längeneinheit."
+    },
+    {
+      "id": "bike",
+      "type": "choice",
+      "prompt": "Welche Energie hat ein fahrendes Fahrrad?",
+      "options": [
+        "Bewegungsenergie",
+        "Nur chemische Energie",
+        "Keine Energie"
+      ],
+      "correct": 0,
+      "explanation": "Wenn sich ein Körper bewegt, besitzt er Bewegungsenergie."
+    },
+    {
+      "id": "sun",
+      "type": "choice",
+      "prompt": "Was wandelt eine Solarzelle hauptsächlich um?",
+      "options": [
+        "Lichtenergie in elektrische Energie",
+        "Wärme in Schall",
+        "Bewegung in Licht"
+      ],
+      "correct": 0,
+      "explanation": "Eine Solarzelle wandelt die Energie des Lichts in elektrische Energie um."
+    },
+    {
+      "id": "brake",
+      "type": "choice",
+      "prompt": "Die Bremsen am Fahrrad werden warm. Warum?",
+      "options": [
+        "Reibung wandelt Bewegungsenergie in Wärme um",
+        "Wärme entsteht aus dem Nichts",
+        "Die Bremsen speichern Sonnenlicht"
+      ],
+      "correct": 0,
+      "explanation": "Beim Bremsen wird Bewegungsenergie durch Reibung in Wärme umgewandelt."
+    },
+    {
+      "id": "speed",
+      "type": "number",
+      "prompt": "Du legst 60 Meter in 10 Sekunden zurück. Wie groß ist deine mittlere Geschwindigkeit?",
+      "answer": 6,
+      "tolerance": 0,
+      "unit": "m/s",
+      "explanation": "Geschwindigkeit = Strecke ÷ Zeit. Also 60 m ÷ 10 s = 6 m/s."
+    },
+    {
+      "id": "height",
+      "type": "choice",
+      "prompt": "Ein Buch liegt oben im Regal. Welche Energie besitzt es durch seine Höhe?",
+      "options": [
+        "Lageenergie",
+        "Schallenergie",
+        "Elektrische Energie"
+      ],
+      "correct": 0,
+      "explanation": "Ein angehobener Körper besitzt Lageenergie. Beim Herunterfallen wird sie in Bewegungsenergie umgewandelt."
+    },
+    {
+      "id": "battery",
+      "type": "choice",
+      "prompt": "Welche Energie speichert eine Batterie?",
+      "options": [
+        "Chemische Energie",
+        "Nur Lichtenergie",
+        "Nur Bewegungsenergie"
+      ],
+      "correct": 0,
+      "explanation": "Eine Batterie speichert chemische Energie und kann diese in elektrische Energie umwandeln."
+    },
+    {
+      "id": "distance",
+      "type": "number",
+      "prompt": "Ein Roller fährt gleichmäßig mit 3 m/s. Welche Strecke legt er in 4 Sekunden zurück?",
+      "answer": 12,
+      "unit": "m",
+      "tolerance": 0,
+      "explanation": "Strecke = Geschwindigkeit × Zeit. 3 m/s × 4 s = 12 m."
+    }
+  ]
+}

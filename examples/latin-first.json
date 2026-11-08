@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "id": "latin-first",
+  "title": "Salve, Latein!",
+  "subject": "Latein",
+  "topic": "Deine ersten Wörter",
+  "grade": 7,
+  "questions": [
+    {
+      "id": "aqua",
+      "type": "input",
+      "prompt": "Was bedeutet „aqua“?",
+      "answers": [
+        "Wasser"
+      ],
+      "explanation": "Die gesuchte Übersetzung ist „Wasser“.",
+      "accentSensitive": true,
+      "caseSensitive": false
+    },
+    {
+      "id": "amicus",
+      "type": "input",
+      "prompt": "Was bedeutet „amicus“?",
+      "answers": [
+        "Freund",
+        "der Freund"
+      ],
+      "explanation": "Die gesuchte Übersetzung ist „Freund“.",
+      "accentSensitive": true,
+      "caseSensitive": false
+    },
+    {
+      "id": "terra",
+      "type": "input",
+      "prompt": "Was bedeutet „terra“?",
+      "answers": [
+        "Erde",
+        "Land"
+      ],
+      "explanation": "Die gesuchte Übersetzung ist „Erde“.",
+      "accentSensitive": true,
+      "caseSensitive": false
+    },
+    {
+      "id": "puella",
+      "type": "input",
+      "prompt": "Was bedeutet „puella“?",
+      "answers": [
+        "Mädchen",
+        "das Mädchen"
+      ],
+      "explanation": "Die gesuchte Übersetzung ist „Mädchen“.",
+      "accentSensitive": true,
+      "caseSensitive": false
+    },
+    {
+      "id": "videre",
+      "type": "input",
+      "prompt": "Wie heißt „sehen“ auf Latein?",
+      "answers": [
+        "videre"
+      ],
+      "explanation": "Die gesuchte Übersetzung ist „videre“.",
+      "accentSensitive": true,
+      "caseSensitive": false
+    },
+    {
+      "id": "audire",
+      "type": "input",
+      "prompt": "Wie heißt „hören“ auf Latein?",
+      "answers": [
+        "audire"
+      ],
+      "explanation": "Die gesuchte Übersetzung ist „audire“.",
+      "accentSensitive": true,
+      "caseSensitive": false
+    },
+    {
+      "id": "sol",
+      "type": "input",
+      "prompt": "Was bedeutet „sol“?",
+      "answers": [
+        "Sonne",
+        "die Sonne"
+      ],
+      "explanation": "Die gesuchte Übersetzung ist „Sonne“.",
+      "accentSensitive": true,
+      "caseSensitive": false
+    },
+    {
+      "id": "luna",
+      "type": "input",
+      "prompt": "Was bedeutet „luna“?",
+      "answers": [
+        "Mond",
+        "der Mond"
+      ],
+      "explanation": "Die gesuchte Übersetzung ist „Mond“.",
+      "accentSensitive": true,
+      "caseSensitive": false
+    }
+  ]
+}
