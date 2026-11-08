@@ -13,7 +13,7 @@ Das gesamte Projekt einschließlich Installationsanleitungen liegt im Repository
 - Aufgaben nach richtigen Antworten an drei verschiedenen Tagen archivieren.
 - Lernpunkte und persönliche Meilensteine sammeln, ohne Ranglisten oder täglichen Pflichtlauf.
 
-**Projektstand:** erste Version für einen Familienbetrieb. Die 16 Tests, der Docker-Image-Bau und die Compose-Validierung bestehen auch auf GitHub. Containerstart und Wiederherstellung auf dem Zielserver, mobile Darstellung und Passkeys auf echten Geräten müssen noch praktisch geprüft werden. Die genaue Abgrenzung steht unter [Projektstand und offene Punkte](docs/PROJEKTSTAND.md).
+**Projektstand:** erste Version für einen Familienbetrieb. Die Anwendungstests, der Docker-Image-Bau und die Compose-Validierung bestehen auch auf GitHub. Containerstart und Wiederherstellung auf dem Zielserver, mobile Darstellung und Passkeys auf echten Geräten müssen noch praktisch geprüft werden. Die genaue Abgrenzung steht unter [Projektstand und offene Punkte](docs/PROJEKTSTAND.md).
 
 ## Wo beginne ich?
 
@@ -39,6 +39,10 @@ DEMO_MODE=true DATA_PATH=./data/demo.sqlite HOST=127.0.0.1 npm start
 ```
 
 Dann **http://localhost:3000** öffnen. Die Demo enthält Englisch, Physik und Latein sowie einen Elternbereich. Sie verwendet Beispielkonten; echte Passkey-Anmeldung und neue Konten sind dort deaktiviert. Für den Demo- und Echtbetrieb immer unterschiedliche Datenbanken verwenden.
+
+## Vorhandener Apache oder andere Webdienste
+
+Wenn bereits Apache auf Port 80/443 läuft, die separate [Apache-Anleitung](docs/APACHE.md) verwenden. Sie startet nur die App auf einem lokalen Port und keinen Caddy. Der folgende Kurzablauf gilt für einen Server mit freien Web-Ports.
 
 ## Kurzablauf: Ubuntu mit Docker
 

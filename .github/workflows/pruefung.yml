@@ -29,4 +29,7 @@ jobs:
         env:
           DOMAIN: lernen.example.invalid
           SETUP_TOKEN: nur-ein-platzhalter-fuer-die-konfigurationspruefung
-        run: docker compose config --quiet
+        run: |
+          docker compose config --quiet
+          docker compose -f compose.apache.yaml config --quiet
+          test "$(docker compose -f compose.apache.yaml config --services)" = app

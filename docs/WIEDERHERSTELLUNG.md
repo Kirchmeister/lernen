@@ -1,5 +1,7 @@
 # Wiederherstellung nach einer Neuinstallation
 
+Bei einem Server mit vorhandenem Apache zuerst [APACHE.md](APACHE.md) lesen. Dort wird die Variante ohne Caddy ausgewählt; keinen zweiten Dienst auf 80/443 starten.
+
 ## Neu anfangen oder Daten erhalten?
 
 | Verfügbar                                    | Ergebnis                                                      |
@@ -22,7 +24,7 @@ Voraussetzungen: eine Sicherung von `scripts/backup.sh`, der passende Git-Stand,
 
 1. Auf dem neuen Server die Voraussetzungen aus [INSTALLATION.md](INSTALLATION.md) herstellen und das Repository klonen.
 2. Nach Möglichkeit den in `version.txt` vermerkten Git-Commit verwenden. Die Version lässt sich lokal mit `tar -xOf SICHERUNG.tar.gz version.txt` lesen. Keine Datenbank oder Geheimnisse in einen KI-Chat laden.
-3. Mit `bash scripts/configure.sh DEINE-BISHERIGE-DOMAIN` eine neue `.env` erstellen. Der neue Setup-Token darf anders sein: Bei vorhandenen Konten dient er nicht zum Anmelden.
+3. Mit `bash scripts/configure.sh DEINE-BISHERIGE-DOMAIN` eine neue `.env` erstellen; bei vorhandenem Apache dafür `bash scripts/configure.sh DEINE-BISHERIGE-DOMAIN --apache` verwenden. Der neue Setup-Token darf anders sein: Bei vorhandenen Konten dient er nicht zum Anmelden.
 4. Die Sicherung geschützt auf den neuen Server übertragen. Schreibzugriffe auf dem alten Server beenden, bevor zwei Systeme denselben Datenstand verwenden.
 5. Im neuen Repository ausführen:
 

@@ -26,7 +26,7 @@ Passwörter, private SSH-Schlüssel, Einrichtungslinks und Datenbankinhalte nich
 1. Repository lesen und Status/Versionsstand prüfen.
 2. Vorhandene Serverdaten und Volumes feststellen; nichts ungeprüft überschreiben.
 3. Neuinstallation oder Datenwiederherstellung auswählen.
-4. Domain und HTTPS vorbereiten.
+4. Domain und HTTPS vorbereiten. Bei vorhandenem Apache zuerst [APACHE.md](APACHE.md) lesen und ausschließlich die Apache-Compose-Variante auswählen.
 5. Konfiguration lokal erzeugen, Container bauen und gegebenenfalls Backup mit dem dokumentierten Skript einspielen.
 6. Auf echten Geräten testen. Passkeys bei Bedarf über die dokumentierte administrative Wiederherstellung neu einrichten.
 7. Datenpersistenz und externes Backup prüfen.

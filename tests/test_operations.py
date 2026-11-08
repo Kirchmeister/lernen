@@ -90,6 +90,19 @@ elif a[:2] not in [["compose", "build"], ["compose", "stop"], ["compose", "start
         self.assertNotEqual(self.run_script("configure.sh", "https://lernen.example.de").returncode, 0)
         self.assertFalse((self.root / ".env").exists())
 
+    def test_apache_configuration_selects_only_separate_compose_file(self):
+        result = self.run_script("configure.sh", "lernen.funkymonkeytown.de", "--apache")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        config = (self.root / ".env").read_text()
+        self.assertIn("COMPOSE_FILE=compose.apache.yaml\n", config)
+        self.assertIn("COMPOSE_PROJECT_NAME=lernreise\n", config)
+        self.assertIn("APP_PORT=18080\n", config)
+        self.assertIn("DOMAIN=lernen.funkymonkeytown.de\n", config)
+
+    def test_unknown_configuration_mode_does_not_create_secret(self):
+        self.assertNotEqual(self.run_script("configure.sh", "lernen.example.de", "--unbekannt").returncode, 0)
+        self.assertFalse((self.root / ".env").exists())
+
     def test_backup_restarts_running_app_even_when_copy_fails(self):
         result = self.run_script("backup.sh", extra={"FAKE_RUNNING": "true", "FAKE_FAIL_CP": "true"})
         self.assertNotEqual(result.returncode, 0)

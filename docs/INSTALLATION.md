@@ -2,6 +2,8 @@
 
 Diese Anleitung benötigt keine Datei aus einem früheren Chat. Der Quellcode wird aus dem Repository bezogen. Für die Rückkehr bestehender Konten und Lernstände zusätzlich [WIEDERHERSTELLUNG.md](WIEDERHERSTELLUNG.md) beachten.
 
+**Bei bereits vorhandenem Apache und belegten Ports 80/443 stattdessen [APACHE.md](APACHE.md) verwenden.** Nicht zusätzlich den Caddy aus der Standardkonfiguration starten.
+
 ## 1. Voraussetzungen
 
 - Eine von Docker unterstützte Ubuntu-Version; Python 3 mindestens 3.9 für die Betriebshilfen.

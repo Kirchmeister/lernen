@@ -1,0 +1,24 @@
+# Eigenständige Alternative für einen vorhandenen Apache auf dem Docker-Host.
+# Ausschließlich diese Datei verwenden, nicht mit compose.yaml zusammenführen.
+name: lernreise
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      ORIGIN: https://${DOMAIN:?Bitte DOMAIN in .env setzen}
+      SETUP_TOKEN: ${SETUP_TOKEN:?Bitte SETUP_TOKEN in .env setzen}
+    ports:
+      - "127.0.0.1:${APP_PORT:-18080}:3000"
+    volumes:
+      - learning_data:/app/data
+    init: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cpus: "0.50"
+    mem_limit: 384m
+    pids_limit: 128
+volumes:
+  learning_data:

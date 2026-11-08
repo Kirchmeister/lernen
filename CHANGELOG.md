@@ -1,5 +1,12 @@
 # Änderungen
 
+## Betrieb hinter bestehendem Apache
+
+- Eigenständige Compose-Datei ohne Caddy, nur auf Loopback-Port 18080 veröffentlicht.
+- Konfiguration mit `configure.sh DOMAIN --apache` und festem Projektnamen ergänzt.
+- Deutsche Anleitung für Bestandsaufnahme, Proxy, HTTPS und Wiederherstellung ergänzt.
+- Zusätzliche Tests für Variantenwahl und Konfigurationsfehler; CI validiert beide Compose-Dateien.
+
 ## GitHub-Übernahme
 
 - Quellcode und Dokumentation auf `Kirchmeister/lernen`, Branch `main`, übernommen; ursprünglichen GitHub-Commit erhalten.
